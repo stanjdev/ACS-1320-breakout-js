@@ -14,7 +14,7 @@ let lives = 3;
 let level = 1;
 
 let brickRowCount = 3;
-let brickColumnCount = 5;
+const brickColumnCount = 5;
 const brickWidth = 75;
 const brickHeight = 20;
 const brickPadding = 10;
@@ -39,10 +39,9 @@ function incrementSettings() {
   level += 1;
   ballSpeed += 1;
   brickRowCount += 1;
-  if (brickRowCount === 5) {
-    brickRowCount = 3;
-    brickColumnCount += 1;
-  }
+  // if (brickRowCount === 5) {
+  //   brickRowCount = 3;
+  // }
 }
 
 function drawScore() {
@@ -65,6 +64,7 @@ function drawLevel() {
 
 // Nested arrays
 const bricks = [];
+let currentBricks = brickRowCount * brickColumnCount;
 
 function initBricks() {
   for (let c = 0; c < brickColumnCount; c += 1) {
@@ -73,6 +73,7 @@ function initBricks() {
       bricks[c][r] = { x: 0, y: 0, status: 1 };
     }
   }
+  currentBricks = brickRowCount * brickColumnCount;
 }
 
 initBricks();
@@ -129,13 +130,16 @@ function collisionDetection() {
       if (b.status === 1) {
         if (x > b.x && x < b.x + brickWidth && y > b.y && y < b.y + brickHeight) {
           dy = -dy;
+          currentBricks -= 1;
+          console.log(`score: ${score}, current bricks: ${currentBricks}`);
           score += 1;
           b.status = 0;
-          if (score === brickRowCount * brickColumnCount) {
-            alert('YOU WIN, CONGRATULATIONS!');
-            document.location.reload();
+          if (currentBricks === 0) {
+            // alert('YOU WIN, CONGRATULATIONS!');
+            // document.location.reload();
             incrementSettings();
             initGame();
+            initBricks();
           }
         }
       }
