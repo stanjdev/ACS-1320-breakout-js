@@ -1,3 +1,6 @@
+import Brick from './classes/brick';
+import Ball from './classes/brick';
+
 const canvas = document.getElementById('myCanvas');
 const ctx = canvas.getContext('2d');
 const ballRadius = 10;
@@ -70,7 +73,7 @@ function initBricks() {
   for (let c = 0; c < brickColumnCount; c += 1) {
     bricks[c] = [];
     for (let r = 0; r < brickRowCount; r += 1) {
-      bricks[c][r] = { x: 0, y: 0, status: 1 };
+      bricks[c][r] = new Brick(0, 0);
     }
   }
   currentBricks = brickRowCount * brickColumnCount;
@@ -147,13 +150,15 @@ function collisionDetection() {
   }
 }
 
-function drawBall() {
-  ctx.beginPath();
-  ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
-  ctx.fillStyle = '#0095DD';
-  ctx.fill();
-  ctx.closePath();
-}
+const ball = new Ball(200, 200, 10);
+
+// function drawBall() {
+//   ctx.beginPath();
+//   ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
+//   ctx.fillStyle = '#0095DD';
+//   ctx.fill();
+//   ctx.closePath();
+// }
 
 function drawPaddle() {
   ctx.beginPath();
@@ -166,7 +171,11 @@ function drawPaddle() {
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawBricks();
-  drawBall();
+
+  // drawBall();
+  ball.move();
+  ball.render(ctx);
+
   drawPaddle();
   drawScore();
   drawLives();
