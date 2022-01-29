@@ -2,11 +2,12 @@
 import Sprite from './Sprite.js';
 
 class Ball extends Sprite {
-  constructor(x = 0, y = 0, radius = 10, color = '#0095DD') {
+  constructor(x = 0, y = 0, radius = 10, color = '#0095DD', ballSpeed = 2) {
     super(x, y, 0, 0, color);
     this.radius = radius;
     this.dx = 2;
     this.dy = -2;
+    this.ballSpeed = ballSpeed;
   }
 
   move() {
@@ -20,6 +21,10 @@ class Ball extends Sprite {
     ctx.fillStyle = this.color;
     ctx.fill();
     ctx.closePath();
+  }
+
+  increaseSpeed() {
+    this.ballSpeed += 1;
   }
 }
 
