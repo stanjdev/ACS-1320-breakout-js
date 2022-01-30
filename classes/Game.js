@@ -1,7 +1,10 @@
+/* eslint-disable import/extensions */
+import Brick from './Brick.js';
+
 class Game {
-  constructor(ball, bricks, paddle, level, score, lives, ctx, width, height, background, currentBricks, initBricks, canvas) {
+  constructor(ball, paddle, level, score, lives, ctx, width, height, background, canvas) {
     this.ball = ball;
-    this.bricks = bricks;
+    this.bricks = [];
     this.paddle = paddle;
     this.level = level;
     this.score = score;
@@ -10,8 +13,7 @@ class Game {
     this.width = width;
     this.height = height;
     this.background = background;
-    this.currentBricks = currentBricks;
-    this.initBricks = initBricks;
+    this.currentBricks = 0;
     this.canvas = canvas;
     this.rightPressed = false;
     this.leftPressed = false;
@@ -22,6 +24,17 @@ class Game {
     this.brickPadding = 10;
     this.brickOffsetTop = 30;
     this.brickOffsetLeft = 30;
+    this.initBricks();
+  }
+
+  initBricks() {
+    for (let c = 0; c < this.brickColumnCount; c += 1) {
+      this.bricks[c] = [];
+      for (let r = 0; r < this.brickRowCount; r += 1) {
+        this.bricks[c][r] = new Brick(0, 0);
+      }
+    }
+    this.currentBricks = this.brickRowCount * this.brickColumnCount;
   }
 
   initGame() {
@@ -52,54 +65,6 @@ class Game {
     }
   }
 
-  draw() {
-    this.ctx.clearRect(0, 0, this.width, this.height);
-    this.background.render(this.ctx);
-    this.drawBricks();
-
-    this.ball.move();
-    this.ball.render(this.ctx);
-
-    this.paddle.render(this.ctx);
-    this.score.render(this.ctx);
-    this.lives.render(this.ctx);
-    this.level.render(this.ctx);
-    this.collisionDetection();
-
-    // BALL BOUNDARIES
-    if (this.ball.x + this.ball.dx > this.width - this.ball.radius || this.ball.x + this.ball.dx < this.ball.radius) {
-      this.ball.dx = -this.ball.dx;
-    }
-    if (this.ball.y + this.ball.dy < this.ball.radius) {
-      this.ball.dy = -this.ball.dy;
-    } else if (this.ball.y + this.ball.dy > this.height - this.ball.radius) {
-      if (this.ball.x > this.paddle.x && this.ball.x < this.paddle.x + this.paddle.width) {
-        this.ball.dy = -this.ball.dy;
-      } else {
-        this.lives.loseLife();
-        if (!this.lives.lives) {
-          alert('GAME OVER');
-          document.location.reload();
-        } else {
-          this.initGame();
-        }
-      }
-    }
-
-    if (this.rightPressed) {
-      this.paddle.x += 7;
-      if (this.paddle.x + this.paddle.width > this.width) {
-        this.paddle.x = this.width - this.paddle.width;
-      }
-    } else if (this.leftPressed) {
-      this.paddle.x -= 7;
-      if (this.paddle.x < 0) {
-        this.paddle.x = 0;
-      }
-    }
-    requestAnimationFrame(this.draw);
-  }
-
   collisionDetection() {
     for (let c = 0; c < this.brickColumnCount; c += 1) {
       for (let r = 0; r < this.brickRowCount; r += 1) {
@@ -108,7 +73,6 @@ class Game {
           if (this.ball.x > b.x && this.ball.x < b.x + b.width && this.ball.y > b.y && this.ball.y < b.y + b.height) {
             this.ball.dy = -this.ball.dy;
             this.currentBricks -= 1;
-            // console.log(`score: ${score.score}, current bricks: ${this.currentBricks}`);
             this.score.update(1);
             b.status = false;
             if (this.currentBricks === 0) {
@@ -137,13 +101,6 @@ class Game {
       this.rightPressed = false;
     } else if (evt.key === 'Left' || evt.key === 'ArrowLeft') {
       this.leftPressed = false;
-    }
-  }
-
-  mouseMoveHandler(evt) {
-    const relativeX = evt.clientX - this.canvas.offsetLeft;
-    if (relativeX > 0 && relativeX < this.width) {
-      this.paddle.x = relativeX - this.paddle.width / 2;
     }
   }
 }
