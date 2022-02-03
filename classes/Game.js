@@ -1,10 +1,10 @@
 /* eslint-disable import/extensions */
-import Brick from './Brick.js';
+import Bricks from './Bricks.js';
 
 class Game {
   constructor(ball, paddle, level, score, lives, ctx, width, height, background, canvas) {
     this.ball = ball;
-    this.bricks = [];
+    this.bricks = new Bricks(3, 5);
     this.paddle = paddle;
     this.level = level;
     this.score = score;
@@ -13,26 +13,10 @@ class Game {
     this.width = width;
     this.height = height;
     this.background = background;
-    this.currentBricks = 0;
     this.canvas = canvas;
     this.rightPressed = false;
     this.leftPressed = false;
-    this.brickRowCount = 3;
-    this.brickColumnCount = 5;
-    this.brickWidth = 75;
-    this.brickHeight = 20;
-    this.brickPadding = 10;
-    this.brickOffsetTop = 30;
-    this.brickOffsetLeft = 30;
-    this.initBricks();
-  }
-
-  initBricks() {
-    for (let i = 0; i < this.brickRowCount * this.brickColumnCount; i += 1) {
-      const row = Math.floor(i / this.brickColumnCount);
-      this.bricks[i] = new Brick(0, 0, undefined, undefined, row % 2 === 0 ? 'orange' : 'crimson');
-    }
-    this.currentBricks = this.brickRowCount * this.brickColumnCount;
+    this.bricks.setup();
   }
 
   initGame() {
@@ -44,26 +28,16 @@ class Game {
   }
 
   incrementSettings() {
-    this.level.updateLevel();
+    this.level.update();
     this.ball.increaseSpeed();
-    this.brickRowCount += 1;
+    this.bricks.rows += 1;
   }
 
   drawBricks() {
-    for (let i = 0; i < this.bricks.length; i += 1) {
-      const c = i % this.brickColumnCount;
-      const r = Math.floor(i / this.brickColumnCount);
-      if (this.bricks[i].status === true) {
-        const brickX = (c * (this.brickWidth + this.brickPadding)) + this.brickOffsetLeft;
-        const brickY = (r * (this.brickHeight + this.brickPadding)) + this.brickOffsetTop;
-        this.bricks[i].x = brickX;
-        this.bricks[i].y = brickY;
-        this.bricks[i].render(this.ctx);
-      }
-    }
+    this.bricks.render(this.ctx);
   }
 
-  randomColor() {
+  static randomColor() {
     const hex = '0123456789ABCDEF';
     let color = '#';
     for (let i = 0; i < 6; i += 1) {
@@ -73,21 +47,26 @@ class Game {
   }
 
   collisionDetection() {
-    for (let i = 0; i < this.bricks.length; i += 1) {
-      const b = this.bricks[i];
+    for (let i = 0; i < this.bricks.bricks.length; i += 1) {
+      const b = this.bricks.bricks[i];
       if (b.status === true) {
-        if (this.ball.x > b.x && this.ball.x < b.x + b.width && this.ball.y > b.y && this.ball.y < b.y + b.height) {
+        if (
+          this.ball.x > b.x
+          && this.ball.x < b.x + b.width
+          && this.ball.y > b.y
+          && this.ball.y < b.y + b.height
+        ) {
           this.ball.dy = -this.ball.dy;
           this.ball.color = this.randomColor();
-          this.currentBricks -= 1;
+          this.bricks.currentBricks -= 1;
           this.score.update(1);
           b.status = false;
-          if (this.currentBricks === 0) {
+          if (this.bricks.currentBricks === 0) {
             // alert('YOU WIN, CONGRATULATIONS!');
             // document.location.reload();
             this.incrementSettings();
             this.initGame();
-            this.initBricks();
+            this.bricks.setup();
           }
         }
       }
