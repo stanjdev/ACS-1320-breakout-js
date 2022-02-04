@@ -37,7 +37,8 @@ class Game {
     this.bricks.render(this.ctx);
   }
 
-  static randomColor() {
+  // eslint-disable-next-line class-methods-use-this
+  randomColor() {
     const hex = '0123456789ABCDEF';
     let color = '#';
     for (let i = 0; i < 6; i += 1) {
